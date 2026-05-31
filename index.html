@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공부 출석부</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#f7f6f2;
+  --surface:#ffffff;
+  --surface2:#f0efe9;
+  --border:#e2e0d8;
+  --border2:#cac8be;
+  --text:#1a1917;
+  --text2:#6b6960;
+  --text3:#a09d94;
+  --green:#1D9E75;
+  --green-bg:#e1f5ee;
+  --green-border:#9fe1cb;
+  --green-text:#085041;
+  --radius:10px;
+  --radius-lg:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem 1rem 4rem}
+.wrap{max-width:480px;margin:0 auto}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.title{font-size:19px;font-weight:700;color:var(--text)}
+.title i{font-size:18px;vertical-align:-2px;margin-right:6px;color:var(--green)}
+.date-badge{font-size:12px;color:var(--text2);background:var(--surface);padding:4px 12px;border-radius:20px;border:1px solid var(--border)}
+.nav{display:flex;gap:6px;margin-bottom:1.5rem}
+.nav-btn{flex:1;padding:10px 6px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;font-family:inherit}
+.nav-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem .875rem}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:3px}
+.stat-val{font-size:21px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.prog-wrap{margin-bottom:1.25rem}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:5px}
+.prog-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s ease}
+.section-title{font-size:12px;font-weight:500;color:var(--text3);margin-bottom:.625rem;letter-spacing:.04em}
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem;display:flex;align-items:center;gap:12px;margin-bottom:6px;cursor:pointer;transition:all .15s;user-select:none}
+.task-card:hover{border-color:var(--border2)}
+.task-card.done{opacity:.5}
+.task-card.shared{border-left:2.5px solid var(--green)}
+.check-circle{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.task-card.done .check-circle{background:var(--green);border-color:var(--green)}
+.check-i{display:none;color:#fff;font-size:13px}
+.task-card.done .check-i{display:block}
+.task-info{flex:1}
+.task-name{font-size:14px;font-weight:500;color:var(--text)}
+.task-card.done .task-name{text-decoration:line-through;color:var(--text3)}
+.task-desc{font-size:12px;color:var(--text3);margin-top:1px}
+.shared-badge{font-size:10px;color:var(--green-text);background:var(--green-bg);padding:2px 7px;border-radius:10px;border:1px solid var(--green-border);margin-left:6px;vertical-align:1px}
+.lec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.125rem;margin-bottom:1.25rem}
+.lec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}
+.lec-title{font-size:14px;font-weight:500;color:var(--text)}
+.lec-count{font-size:13px;color:var(--text2)}
+.lec-grid{display:flex;flex-wrap:wrap;gap:5px}
+.lec-dot{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);cursor:pointer;transition:all .15s}
+.lec-dot:hover{border-color:var(--border2)}
+.lec-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.lec-dot.current{border:2px solid var(--green);color:var(--green);font-weight:700}
+.sync-note{font-size:11px;color:var(--text3);text-align:center;margin-top:.625rem}
+
+/* Timer */
+.timer-wrap{display:flex;flex-direction:column;align-items:center;padding:1rem 0 1.5rem}
+.mode-row{display:flex;gap:6px;margin-bottom:2rem}
+.mode-btn{padding:7px 16px;border:1px solid var(--border);border-radius:20px;background:var(--surface);cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;font-family:inherit}
+.mode-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.clock-face{position:relative;width:200px;height:200px;margin-bottom:2rem}
+.clock-svg{transform:rotate(-90deg)}
+.clock-track{fill:none;stroke:var(--border);stroke-width:8}
+.clock-prog{fill:none;stroke:var(--green);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+.clock-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.time-display{font-size:42px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.mode-label{font-size:12px;color:var(--text2);margin-top:2px}
+.ctrl-row{display:flex;gap:10px;align-items:center;margin-bottom:2rem}
+.ctrl-btn{width:50px;height:50px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text)}
+.ctrl-btn:hover{background:var(--surface2)}
+.ctrl-btn.primary{width:64px;height:64px;border-color:var(--border2)}
+.today-log{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.125rem}
+.log-head{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:.75rem}
+.log-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.log-item:last-child{border-bottom:none}
+.log-time{color:var(--text3);font-size:12px}
+.log-dur{color:var(--green);font-weight:700}
+.empty-log{font-size:13px;color:var(--text3);text-align:center;padding:.5rem 0}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:100;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="top-bar">
+    <span class="title"><i class="ti ti-book-2"></i>공부 출석부</span>
+    <span class="date-badge" id="date-badge"></span>
+  </div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="switchTab('unni')" id="tab-unni">누나</button>
+    <button class="nav-btn" onclick="switchTab('dong')" id="tab-dong">동생</button>
+    <button class="nav-btn" onclick="switchTab('timer')" id="tab-timer"><i class="ti ti-clock" style="vertical-align:-1px;margin-right:3px"></i>타이머</button>
+  </div>
+  <div id="main"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DAY=['일','월','화','수','목','금','토'];
+const now=new Date();
+const todayKey=now.toISOString().slice(0,10);
+const dayIdx=now.getDay();
+document.getElementById('date-badge').textContent=`${now.getMonth()+1}월 ${now.getDate()}일 (${DAY[dayIdx]})`;
+const isMW=dayIdx===1||dayIdx===3;
+
+const SHARED=['word_test','quiz'];
+const USERS={
+  unni:{name:'누나',total:30,tasks:[
+    {id:'lecture',name:'강의 듣기',desc:isMW?'9:00~10:00':'14:00~15:00'},
+    {id:'hw',name:'숙제하기',desc:isMW?'16:00~18:00':'15:00~18:00'},
+    {id:'words',name:'단어 외우기',desc:isMW?'16:00~18:00':'15:00~18:00'},
+    {id:'review',name:'복습하기',desc:isMW?'16:00~18:00':'15:00~18:00'},
+    {id:'word_test',name:'단어 시험',desc:'20:00 (변동 가능)',shared:true},
+    {id:'quiz',name:'복습 퀴즈',desc:'20:30~21:00',shared:true},
+  ]},
+  dong:{name:'동생',total:22,tasks:[
+    {id:'lecture',name:'강의 듣기',desc:'15:00~16:00'},
+    {id:'hw',name:'숙제하기',desc:'16:00~18:00'},
+    {id:'words',name:'단어 외우기',desc:'16:00~18:00'},
+    {id:'review',name:'복습하기',desc:'16:00~18:00'},
+    {id:'word_test',name:'단어 시험',desc:'20:00 (변동 가능)',shared:true},
+    {id:'quiz',name:'복습 퀴즈',desc:'20:30~21:00',shared:true},
+  ]}
+};
+
+const STORE_KEY='study_app_v1';
+let currentTab='unni';
+let state={unni:{checks:{},lectureDone:0},dong:{checks:{},lectureDone:0},sharedChecks:{},timerLog:{}};
+
+function loadState(){
+  try{const d=localStorage.getItem(STORE_KEY);if(d)state=JSON.parse(d);}catch(e){}
+  render();
+}
+function saveState(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){}
+  showToast('저장 완료 ✓');
+}
+function getChecks(u){
+  if(!state[u].checks[todayKey])state[u].checks[todayKey]={};
+  return state[u].checks[todayKey];
+}
+function getShared(){
+  if(!state.sharedChecks[todayKey])state.sharedChecks[todayKey]={};
+  return state.sharedChecks[todayKey];
+}
+function toggleTask(id){
+  if(SHARED.includes(id)){const s=getShared();s[id]=!s[id];}
+  else{const c=getChecks(currentTab);c[id]=!c[id];}
+  render();saveState();
+}
+function toggleLecture(n){
+  const u=state[currentTab];
+  u.lectureDone=(u.lectureDone===n)?n-1:n;
+  render();saveState();
+}
+function switchTab(t){
+  currentTab=t;
+  ['unni','dong','timer'].forEach(x=>{
+    document.getElementById('tab-'+x).className='nav-btn'+(x===t?' active':'');
+  });
+  render();
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+function calcStreak(u){
+  let streak=0;const d=new Date();
+  while(true){
+    const key=d.toISOString().slice(0,10);
+    const c=state[u].checks[key]||{};
+    const s=state.sharedChecks[key]||{};
+    const tasks=USERS[u].tasks;
+    const done=tasks.filter(t=>SHARED.includes(t.id)?s[t.id]:c[t.id]).length;
+    if(done===0&&key!==todayKey)break;
+    if(done>0)streak++;
+    d.setDate(d.getDate()-1);
+    if(streak>365)break;
+  }
+  return streak;
+}
+
+function renderChecklist(){
+  const u=currentTab;
+  const user=USERS[u];
+  const checks=getChecks(u);
+  const shared=getShared();
+  const allDone=user.tasks.filter(t=>SHARED.includes(t.id)?shared[t.id]:checks[t.id]).length;
+  const pct=Math.round(allDone/user.tasks.length*100);
+  const ld=state[u].lectureDone;
+  const streak=calcStreak(u);
+
+  let h=`<div class="stats-grid">
+    <div class="stat"><div class="stat-label">오늘 달성률</div><div class="stat-val">${pct}%</div><div class="stat-sub">${allDone}/${user.tasks.length} 완료</div></div>
+    <div class="stat"><div class="stat-label">강의 진도</div><div class="stat-val">${ld}<span style="font-size:13px;font-weight:400;color:var(--text3)">/${user.total}</span></div><div class="stat-sub">${Math.round(ld/user.total*100)}% 이수</div></div>
+    <div class="stat"><div class="stat-label">연속 출석</div><div class="stat-val">${streak}<span style="font-size:13px;font-weight:400;color:var(--text3)">일</span></div><div class="stat-sub">🔥 스트릭</div></div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-label"><span>오늘 진행률</span><span>${pct}%</span></div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+  </div>
+  <div class="section-title">오늘 할 일</div>`;
+
+  for(const t of user.tasks){
+    const done=SHARED.includes(t.id)?!!shared[t.id]:!!checks[t.id];
+    h+=`<div class="task-card${done?' done':''}${t.shared?' shared':''}" onclick="toggleTask('${t.id}')">
+      <div class="check-circle"><i class="ti ti-check check-i"></i></div>
+      <div class="task-info">
+        <div class="task-name">${t.name}${t.shared?'<span class="shared-badge">공통</span>':''}</div>
+        <div class="task-desc">${t.desc}</div>
+      </div>
+    </div>`;
+  }
+
+  h+=`<div class="lec-card">
+    <div class="lec-head"><span class="lec-title"><i class="ti ti-player-play" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>강의 진도표</span><span class="lec-count">${ld} / ${user.total}강</span></div>
+    <div class="lec-grid">`;
+  for(let i=1;i<=user.total;i++){
+    const cls=i<ld?'lec-dot done':i===ld?'lec-dot current':'lec-dot';
+    h+=`<div class="${cls}" onclick="toggleLecture(${i})">${i}</div>`;
+  }
+  h+=`</div></div>
+  <div class="sync-note"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:-1px;margin-right:3px"></i>단어 시험·복습 퀴즈는 두 사람 공통이에요</div>`;
+
+  document.getElementById('main').innerHTML=h;
+}
+
+/* Timer */
+const MODES={focus:{label:'집중',default:25},short:{label:'짧은 휴식',default:5},long:{label:'긴 휴식',default:15}};
+let timer={mode:'focus',running:false,remaining:25*60,total:25*60,interval:null,sessions:0};
+
+function renderTimer(){
+  const log=state.timerLog[todayKey]||[];
+  const totalMin=log.reduce((a,l)=>a+l.dur,0);
+  let h=`<div class="timer-wrap">
+    <div class="mode-row">`;
+  for(const[k,v] of Object.entries(MODES)){
+    h+=`<button class="mode-btn${timer.mode===k?' active':''}" onclick="setMode('${k}')">${v.label}</button>`;
+  }
+  h+=`</div>
+    <div class="clock-face">
+      <svg class="clock-svg" width="200" height="200" viewBox="0 0 200 200">
+        <circle class="clock-track" cx="100" cy="100" r="86"/>
+        <circle class="clock-prog" cx="100" cy="100" r="86"
+          stroke-dasharray="${2*Math.PI*86}"
+          stroke-dashoffset="${2*Math.PI*86*(1-timer.remaining/timer.total)}"
+          id="cprog"/>
+      </svg>
+      <div class="clock-center">
+        <div class="time-display" id="tdisp">${fmt(timer.remaining)}</div>
+        <div class="mode-label">${MODES[timer.mode].label}</div>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <button class="ctrl-btn" onclick="resetTimer()"><i class="ti ti-refresh" style="font-size:20px"></i></button>
+      <button class="ctrl-btn primary" onclick="toggleTimer()" id="play-btn">
+        <i class="ti ${timer.running?'ti-player-pause':'ti-player-play'}" style="font-size:22px"></i>
+      </button>
+      <button class="ctrl-btn" onclick="skipTimer()"><i class="ti ti-player-skip-forward" style="font-size:20px"></i></button>
+    </div>
+  </div>
+  <div class="today-log">
+    <div class="log-head"><i class="ti ti-clock" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>오늘 집중 기록 — 총 ${totalMin}분</div>`;
+  if(log.length===0){
+    h+=`<div class="empty-log">아직 기록이 없어요</div>`;
+  }else{
+    for(const l of [...log].reverse()){
+      h+=`<div class="log-item"><span>${l.who} · ${MODES[l.mode]?.label||l.mode}</span><span class="log-time">${l.at}</span><span class="log-dur">${l.dur}분</span></div>`;
+    }
+  }
+  h+=`</div>`;
+  document.getElementById('main').innerHTML=h;
+}
+
+function fmt(s){const m=Math.floor(s/60);const sec=s%60;return`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+function setMode(m){
+  if(timer.running)clearInterval(timer.interval);
+  timer.running=false;timer.mode=m;
+  timer.total=MODES[m].default*60;timer.remaining=timer.total;
+  renderTimer();
+}
+function toggleTimer(){
+  if(timer.running){clearInterval(timer.interval);timer.running=false;renderTimer();return;}
+  timer.running=true;
+  timer.interval=setInterval(()=>{
+    timer.remaining--;
+    const p=document.getElementById('cprog');
+    const d=document.getElementById('tdisp');
+    if(p)p.setAttribute('stroke-dashoffset',2*Math.PI*86*(1-timer.remaining/timer.total));
+    if(d)d.textContent=fmt(timer.remaining);
+    if(timer.remaining<=0){
+      clearInterval(timer.interval);timer.running=false;
+      const dur=Math.round(timer.total/60);
+      logSession(dur);
+      timer.sessions++;
+      const next=timer.mode==='focus'?(timer.sessions%4===0?'long':'short'):'focus';
+      showToast(timer.mode==='focus'?`집중 완료! ${dur}분 기록됨`:'휴식 완료!');
+      setMode(next);
+    }
+  },1000);
+  renderTimer();
+}
+function resetTimer(){
+  if(timer.running)clearInterval(timer.interval);
+  timer.running=false;timer.remaining=timer.total;renderTimer();
+}
+function skipTimer(){
+  if(timer.running)clearInterval(timer.interval);
+  timer.running=false;
+  const next=timer.mode==='focus'?(timer.sessions%4===0?'long':'short'):'focus';
+  setMode(next);
+}
+function logSession(dur){
+  if(!state.timerLog[todayKey])state.timerLog[todayKey]=[];
+  const n=new Date();
+  const at=`${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`;
+  const who=currentTab==='timer'?'나':USERS[currentTab]?.name||'나';
+  state.timerLog[todayKey].push({who,mode:timer.mode,dur,at});
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){}
+}
+
+function render(){
+  if(currentTab==='timer')renderTimer();
+  else renderChecklist();
+}
+
+loadState();
+</script>
+</body>
+</html>
