@@ -9,28 +9,21 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 :root{
-  --bg:#f7f6f2;
-  --surface:#ffffff;
-  --surface2:#f0efe9;
-  --border:#e2e0d8;
-  --border2:#cac8be;
-  --text:#1a1917;
-  --text2:#6b6960;
-  --text3:#a09d94;
-  --green:#1D9E75;
-  --green-bg:#e1f5ee;
-  --green-border:#9fe1cb;
-  --green-text:#085041;
-  --radius:10px;
-  --radius-lg:14px;
+  --bg:#f7f6f2;--surface:#ffffff;--surface2:#f0efe9;--border:#e2e0d8;--border2:#cac8be;
+  --text:#1a1917;--text2:#6b6960;--text3:#a09d94;
+  --green:#1D9E75;--green-bg:#e1f5ee;--green-border:#9fe1cb;--green-text:#085041;
+  --radius:10px;--radius-lg:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem 1rem 4rem}
 .wrap{max-width:480px;margin:0 auto}
 .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
-.title{font-size:19px;font-weight:700;color:var(--text)}
+.title{font-size:19px;font-weight:700}
 .title i{font-size:18px;vertical-align:-2px;margin-right:6px;color:var(--green)}
 .date-badge{font-size:12px;color:var(--text2);background:var(--surface);padding:4px 12px;border-radius:20px;border:1px solid var(--border)}
+.sync-status{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-bottom:1rem}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3)}
+.sync-dot.online{background:var(--green)}
 .nav{display:flex;gap:6px;margin-bottom:1.5rem}
 .nav-btn{flex:1;padding:10px 6px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;font-family:inherit}
 .nav-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
@@ -53,13 +46,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .check-i{display:none;color:#fff;font-size:13px}
 .task-card.done .check-i{display:block}
 .task-info{flex:1}
-.task-name{font-size:14px;font-weight:500;color:var(--text)}
+.task-name{font-size:14px;font-weight:500}
 .task-card.done .task-name{text-decoration:line-through;color:var(--text3)}
 .task-desc{font-size:12px;color:var(--text3);margin-top:1px}
 .shared-badge{font-size:10px;color:var(--green-text);background:var(--green-bg);padding:2px 7px;border-radius:10px;border:1px solid var(--green-border);margin-left:6px;vertical-align:1px}
 .lec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.125rem;margin-bottom:1.25rem}
 .lec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}
-.lec-title{font-size:14px;font-weight:500;color:var(--text)}
+.lec-title{font-size:14px;font-weight:500}
 .lec-count{font-size:13px;color:var(--text2)}
 .lec-grid{display:flex;flex-wrap:wrap;gap:5px}
 .lec-dot{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);cursor:pointer;transition:all .15s}
@@ -67,8 +60,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .lec-dot.done{background:var(--green);border-color:var(--green);color:#fff}
 .lec-dot.current{border:2px solid var(--green);color:var(--green);font-weight:700}
 .sync-note{font-size:11px;color:var(--text3);text-align:center;margin-top:.625rem}
-
-/* Timer */
 .timer-wrap{display:flex;flex-direction:column;align-items:center;padding:1rem 0 1.5rem}
 .mode-row{display:flex;gap:6px;margin-bottom:2rem}
 .mode-btn{padding:7px 16px;border:1px solid var(--border);border-radius:20px;background:var(--surface);cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;font-family:inherit}
@@ -93,6 +84,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .empty-log{font-size:13px;color:var(--text3);text-align:center;padding:.5rem 0}
 .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:100;white-space:nowrap}
 .toast.show{opacity:1}
+.loading{text-align:center;padding:3rem 0;color:var(--text3);font-size:14px}
 </style>
 </head>
 <body>
@@ -101,16 +93,35 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <span class="title"><i class="ti ti-book-2"></i>공부 출석부</span>
     <span class="date-badge" id="date-badge"></span>
   </div>
+  <div class="sync-status" id="sync-status">
+    <span class="sync-dot" id="sync-dot"></span>
+    <span id="sync-text">연결 중...</span>
+  </div>
   <div class="nav">
     <button class="nav-btn active" onclick="switchTab('unni')" id="tab-unni">누나</button>
     <button class="nav-btn" onclick="switchTab('dong')" id="tab-dong">동생</button>
     <button class="nav-btn" onclick="switchTab('timer')" id="tab-timer"><i class="ti ti-clock" style="vertical-align:-1px;margin-right:3px"></i>타이머</button>
   </div>
-  <div id="main"></div>
+  <div id="main"><div class="loading">불러오는 중...</div></div>
 </div>
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyChxMmbpJS78Y6aYj7RwWm2aNWN0lrjI9A",
+  authDomain: "roo-io.firebaseapp.com",
+  projectId: "roo-io",
+  storageBucket: "roo-io.firebasestorage.app",
+  messagingSenderId: "372359736101",
+  appId: "1:372359736101:web:3cc895724f4e743c9088cc"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const DAY=['일','월','화','수','목','금','토'];
 const now=new Date();
 const todayKey=now.toISOString().slice(0,10);
@@ -138,18 +149,40 @@ const USERS={
   ]}
 };
 
-const STORE_KEY='study_app_v1';
 let currentTab='unni';
 let state={unni:{checks:{},lectureDone:0},dong:{checks:{},lectureDone:0},sharedChecks:{},timerLog:{}};
+let saving=false;
 
-function loadState(){
-  try{const d=localStorage.getItem(STORE_KEY);if(d)state=JSON.parse(d);}catch(e){}
+const docRef=doc(db,'study','shared');
+
+// 실시간 동기화
+onSnapshot(docRef,(snap)=>{
+  if(snap.exists()){
+    const d=snap.data();
+    if(d.state) state=d.state;
+  }
+  document.getElementById('sync-dot').className='sync-dot online';
+  document.getElementById('sync-text').textContent='실시간 동기화 중';
   render();
+},(err)=>{
+  document.getElementById('sync-text').textContent='오프라인 — 로컬 저장';
+  render();
+});
+
+async function saveState(){
+  if(saving)return;
+  saving=true;
+  try{
+    await setDoc(docRef,{state,updatedAt:new Date().toISOString()});
+    showToast('저장 완료 ✓');
+  }catch(e){
+    // 로컬 fallback
+    localStorage.setItem('study_backup',JSON.stringify(state));
+    showToast('로컬 저장됨');
+  }
+  saving=false;
 }
-function saveState(){
-  try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){}
-  showToast('저장 완료 ✓');
-}
+
 function getChecks(u){
   if(!state[u].checks[todayKey])state[u].checks[todayKey]={};
   return state[u].checks[todayKey];
@@ -163,11 +196,15 @@ function toggleTask(id){
   else{const c=getChecks(currentTab);c[id]=!c[id];}
   render();saveState();
 }
+window.toggleTask=toggleTask;
+
 function toggleLecture(n){
   const u=state[currentTab];
   u.lectureDone=(u.lectureDone===n)?n-1:n;
   render();saveState();
 }
+window.toggleLecture=toggleLecture;
+
 function switchTab(t){
   currentTab=t;
   ['unni','dong','timer'].forEach(x=>{
@@ -175,11 +212,14 @@ function switchTab(t){
   });
   render();
 }
+window.switchTab=switchTab;
+
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),1800);
 }
+
 function calcStreak(u){
   let streak=0;const d=new Date();
   while(true){
@@ -236,65 +276,58 @@ function renderChecklist(){
     h+=`<div class="${cls}" onclick="toggleLecture(${i})">${i}</div>`;
   }
   h+=`</div></div>
-  <div class="sync-note"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:-1px;margin-right:3px"></i>단어 시험·복습 퀴즈는 두 사람 공통이에요</div>`;
-
+  <div class="sync-note"><i class="ti ti-cloud" style="font-size:13px;vertical-align:-1px;margin-right:3px"></i>단어 시험·복습 퀴즈는 두 사람 공통이에요</div>`;
   document.getElementById('main').innerHTML=h;
 }
 
-/* Timer */
 const MODES={focus:{label:'집중',default:25},short:{label:'짧은 휴식',default:5},long:{label:'긴 휴식',default:15}};
 let timer={mode:'focus',running:false,remaining:25*60,total:25*60,interval:null,sessions:0};
+
+function fmt(s){const m=Math.floor(s/60);const sec=s%60;return`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 
 function renderTimer(){
   const log=state.timerLog[todayKey]||[];
   const totalMin=log.reduce((a,l)=>a+l.dur,0);
-  let h=`<div class="timer-wrap">
-    <div class="mode-row">`;
+  let h=`<div class="timer-wrap"><div class="mode-row">`;
   for(const[k,v] of Object.entries(MODES)){
     h+=`<button class="mode-btn${timer.mode===k?' active':''}" onclick="setMode('${k}')">${v.label}</button>`;
   }
-  h+=`</div>
-    <div class="clock-face">
-      <svg class="clock-svg" width="200" height="200" viewBox="0 0 200 200">
-        <circle class="clock-track" cx="100" cy="100" r="86"/>
-        <circle class="clock-prog" cx="100" cy="100" r="86"
-          stroke-dasharray="${2*Math.PI*86}"
-          stroke-dashoffset="${2*Math.PI*86*(1-timer.remaining/timer.total)}"
-          id="cprog"/>
-      </svg>
-      <div class="clock-center">
-        <div class="time-display" id="tdisp">${fmt(timer.remaining)}</div>
-        <div class="mode-label">${MODES[timer.mode].label}</div>
-      </div>
-    </div>
-    <div class="ctrl-row">
-      <button class="ctrl-btn" onclick="resetTimer()"><i class="ti ti-refresh" style="font-size:20px"></i></button>
-      <button class="ctrl-btn primary" onclick="toggleTimer()" id="play-btn">
-        <i class="ti ${timer.running?'ti-player-pause':'ti-player-play'}" style="font-size:22px"></i>
-      </button>
-      <button class="ctrl-btn" onclick="skipTimer()"><i class="ti ti-player-skip-forward" style="font-size:20px"></i></button>
+  h+=`</div><div class="clock-face">
+    <svg class="clock-svg" width="200" height="200" viewBox="0 0 200 200">
+      <circle class="clock-track" cx="100" cy="100" r="86"/>
+      <circle class="clock-prog" cx="100" cy="100" r="86"
+        stroke-dasharray="${2*Math.PI*86}"
+        stroke-dashoffset="${2*Math.PI*86*(1-timer.remaining/timer.total)}"
+        id="cprog"/>
+    </svg>
+    <div class="clock-center">
+      <div class="time-display" id="tdisp">${fmt(timer.remaining)}</div>
+      <div class="mode-label">${MODES[timer.mode].label}</div>
     </div>
   </div>
+  <div class="ctrl-row">
+    <button class="ctrl-btn" onclick="resetTimer()"><i class="ti ti-refresh" style="font-size:20px"></i></button>
+    <button class="ctrl-btn primary" onclick="toggleTimer()">
+      <i class="ti ${timer.running?'ti-player-pause':'ti-player-play'}" style="font-size:22px"></i>
+    </button>
+    <button class="ctrl-btn" onclick="skipTimer()"><i class="ti ti-player-skip-forward" style="font-size:20px"></i></button>
+  </div></div>
   <div class="today-log">
     <div class="log-head"><i class="ti ti-clock" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>오늘 집중 기록 — 총 ${totalMin}분</div>`;
-  if(log.length===0){
-    h+=`<div class="empty-log">아직 기록이 없어요</div>`;
-  }else{
-    for(const l of [...log].reverse()){
-      h+=`<div class="log-item"><span>${l.who} · ${MODES[l.mode]?.label||l.mode}</span><span class="log-time">${l.at}</span><span class="log-dur">${l.dur}분</span></div>`;
-    }
-  }
+  if(log.length===0){h+=`<div class="empty-log">아직 기록이 없어요</div>`;}
+  else{for(const l of [...log].reverse()){h+=`<div class="log-item"><span>${l.who} · ${MODES[l.mode]?.label||l.mode}</span><span class="log-time">${l.at}</span><span class="log-dur">${l.dur}분</span></div>`;}}
   h+=`</div>`;
   document.getElementById('main').innerHTML=h;
 }
 
-function fmt(s){const m=Math.floor(s/60);const sec=s%60;return`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 function setMode(m){
   if(timer.running)clearInterval(timer.interval);
   timer.running=false;timer.mode=m;
   timer.total=MODES[m].default*60;timer.remaining=timer.total;
   renderTimer();
 }
+window.setMode=setMode;
+
 function toggleTimer(){
   if(timer.running){clearInterval(timer.interval);timer.running=false;renderTimer();return;}
   timer.running=true;
@@ -316,31 +349,35 @@ function toggleTimer(){
   },1000);
   renderTimer();
 }
+window.toggleTimer=toggleTimer;
+
 function resetTimer(){
   if(timer.running)clearInterval(timer.interval);
   timer.running=false;timer.remaining=timer.total;renderTimer();
 }
+window.resetTimer=resetTimer;
+
 function skipTimer(){
   if(timer.running)clearInterval(timer.interval);
   timer.running=false;
   const next=timer.mode==='focus'?(timer.sessions%4===0?'long':'short'):'focus';
   setMode(next);
 }
-function logSession(dur){
+window.skipTimer=skipTimer;
+
+async function logSession(dur){
   if(!state.timerLog[todayKey])state.timerLog[todayKey]=[];
   const n=new Date();
   const at=`${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`;
-  const who=currentTab==='timer'?'나':USERS[currentTab]?.name||'나';
+  const who=USERS[currentTab]?.name||'나';
   state.timerLog[todayKey].push({who,mode:timer.mode,dur,at});
-  try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){}
+  await saveState();
 }
 
 function render(){
   if(currentTab==='timer')renderTimer();
   else renderChecklist();
 }
-
-loadState();
 </script>
 </body>
 </html>
