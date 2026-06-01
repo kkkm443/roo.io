@@ -124,7 +124,7 @@ const db = getFirestore(app);
 
 const DAY=['일','월','화','수','목','금','토'];
 const now=new Date();
-const todayKey=now.toISOString().slice(0,10);
+const todayKey = new Date().toLocaleDateString('sv', { timeZone: 'Asia/Seoul' });
 const dayIdx=now.getDay();
 document.getElementById('date-badge').textContent=`${now.getMonth()+1}월 ${now.getDate()}일 (${DAY[dayIdx]})`;
 const isMW=dayIdx===1||dayIdx===3;
